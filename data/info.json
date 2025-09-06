@@ -1,0 +1,24 @@
+{
+    "Data description":{
+        "0":"Global warming potentials",
+        "1":"Sectors",
+        "2":"Regions",
+        "3":"Author & contact",
+        "4":"R code",
+        "5":"Land use data",
+        "6":"Last date of compilation",
+        "7":"Sources",
+        "8":"Link to public EDGAR version"
+    },
+    "This data file provides global, regional, national, and sectoral estimates of greenhouse gas (GHG) emissions from 1970-2019":{
+        "0":"Emissions by gas are provided in tons of CO2 equivalent, based on 100 year global warming potentials from the IPCC 6th Assessment Report. We also aggregate all Fgases into a single variable. Please see the separate file 'essd_ghg_data.xlsx' for data in original gas units.",
+        "1":"Emissions have been allocated to major sectors corresponding to the IPCC AR6 chapters on consultation with the chapter leads. A further breakdown by subsector is also available. A full list and description of how emissions codes match to sectors and subsectors is in the sector_classification tab.",
+        "2":"Countries have been allocated to regions by the IPCC AR6 WGIII Technical Support Unit. A summary of the country and region codes is in the region_classification tab.",
+        "3":"William F. Lamb (Lamb@mcc-berlin.net) compiled this data from underlying sources (see metadata).",
+        "4":"The code for compiling this data (as well as summary figures for AR6 Ch2) is available online: https:\/\/github.com\/mcc-apsis\/AR6-Emissions-trends-and-drivers",
+        "5":"CO2-LULUCF emissions are available as a separate file ('essd_lulucf_data.xlsx') for IPCC regions only.",
+        "6":"2022-04-25 13:39:55",
+        "7":"See metadata tab",
+        "8":"https:\/\/edgar.jrc.ec.europa.eu\/dataset_ghg60"
+    }
+}

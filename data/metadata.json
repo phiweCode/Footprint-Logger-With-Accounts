@@ -1,0 +1,37 @@
+{
+    "Variable":{
+        "0":"CO2",
+        "1":"CH4",
+        "2":"N2O",
+        "3":"Fgas",
+        "4":"GHG"
+    },
+    "Description":{
+        "0":"Carbon dioxide emissions",
+        "1":"Methane emissions",
+        "2":"Nitrous Oxide emissions",
+        "3":"Fluorinated gas emissions",
+        "4":"Total greenhouse gas emissions"
+    },
+    "Units":{
+        "0":"tCO2eq",
+        "1":"tCO2eq",
+        "2":"tCO2eq",
+        "3":"tCO2eq",
+        "4":"tCO2eq"
+    },
+    "Source":{
+        "0":"EDGAR_v6.0",
+        "1":"EDGAR_v6.0",
+        "2":"EDGAR_v6.0",
+        "3":"EDGAR_v6.0",
+        "4":"EDGAR_v6.0"
+    },
+    "Citation":{
+        "0":"Crippa, Monica; Guizzardi, Diego; Muntean, Marilena; Schaaf, Edwin; Lo Vullo, Eleonora; Solazzo, Efisio; Monforti-Ferrario, Fabio; Olivier, Jos; Vignati, Elisabetta (2021):  EDGAR v6.0 Greenhouse Gas Emissions. European Commission, Joint Research Centre (JRC) [Dataset] PID: http:\/\/data.europa.eu\/89h\/97a67d67-c62e-4826-b873-9d972c4f670b",
+        "1":"Crippa, Monica; Guizzardi, Diego; Muntean, Marilena; Schaaf, Edwin; Lo Vullo, Eleonora; Solazzo, Efisio; Monforti-Ferrario, Fabio; Olivier, Jos; Vignati, Elisabetta (2021):  EDGAR v6.0 Greenhouse Gas Emissions. European Commission, Joint Research Centre (JRC) [Dataset] PID: http:\/\/data.europa.eu\/89h\/97a67d67-c62e-4826-b873-9d972c4f670b",
+        "2":"Crippa, Monica; Guizzardi, Diego; Muntean, Marilena; Schaaf, Edwin; Lo Vullo, Eleonora; Solazzo, Efisio; Monforti-Ferrario, Fabio; Olivier, Jos; Vignati, Elisabetta (2021):  EDGAR v6.0 Greenhouse Gas Emissions. European Commission, Joint Research Centre (JRC) [Dataset] PID: http:\/\/data.europa.eu\/89h\/97a67d67-c62e-4826-b873-9d972c4f670b",
+        "3":"Crippa, Monica; Guizzardi, Diego; Muntean, Marilena; Schaaf, Edwin; Lo Vullo, Eleonora; Solazzo, Efisio; Monforti-Ferrario, Fabio; Olivier, Jos; Vignati, Elisabetta (2021):  EDGAR v6.0 Greenhouse Gas Emissions. European Commission, Joint Research Centre (JRC) [Dataset] PID: http:\/\/data.europa.eu\/89h\/97a67d67-c62e-4826-b873-9d972c4f670b",
+        "4":"Crippa, Monica; Guizzardi, Diego; Muntean, Marilena; Schaaf, Edwin; Lo Vullo, Eleonora; Solazzo, Efisio; Monforti-Ferrario, Fabio; Olivier, Jos; Vignati, Elisabetta (2021):  EDGAR v6.0 Greenhouse Gas Emissions. European Commission, Joint Research Centre (JRC) [Dataset] PID: http:\/\/data.europa.eu\/89h\/97a67d67-c62e-4826-b873-9d972c4f670b"
+    }
+}
