@@ -1,1 +1,19 @@
+#Get ch4_gwps
 GET http://localhost:3001/carbon/region_classification/
+
+### Get data 
+GET http://localhost:3001/carbon/data 
+
+### Get info 
+GET http://localhost:3001/carbon/info  
+
+### Get metadata
+GET http://localhost:3001/carbon/metadata
+
+### Get metadata
+GET http://localhost:3001/carbon/sector_classification
+
+
+
+### Get emission factors 
+GET http://localhost:3001/carbon/emission_factors
