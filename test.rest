@@ -17,3 +17,14 @@ GET http://localhost:3001/carbon/sector_classification
 
 ### Get emission factors 
 GET http://localhost:3001/carbon/emission_factors
+
+
+
+### Get emission factors 
+POST http://localhost:3001/auth/login 
+Content-Type: application/json 
+
+{ 
+    "email": "thabo@email.com",
+    "password": "mypassword"
+}
