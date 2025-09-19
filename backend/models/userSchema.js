@@ -22,6 +22,8 @@ UserSchema.virtual('logs', {
   foreignField: 'user'
 });
 
+UserSchema.set('toJSON', { virtuals: true})
+
 const UserModel = mongoose.model('user', UserSchema);
 const GHGLogsModel = mongoose.model('ghg_log', GHGLogsSchema);
 

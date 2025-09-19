@@ -45,7 +45,8 @@ const createUser = async ({newUser}) => {
       } catch (error) {
         throw Error(error.message)
       }
-}
+} 
+
 
 module.exports = {
   getUser,

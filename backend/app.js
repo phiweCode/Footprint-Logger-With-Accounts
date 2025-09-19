@@ -34,13 +34,15 @@ app.use(passport.initialize())
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var carbonDataRouter = require('./routes/carbonDataRoutes'); 
-var authRouter = require('./routes/auth')
+var authRouter = require('./routes/auth'); 
+var logsRouter = require('./routes/logsRoute')
 
 //endpoints 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/carbon', carbonDataRouter)
-app.use('/auth', authRouter)
+app.use('/carbon', carbonDataRouter); 
+app.use('/auth', authRouter); 
+app.use('/log', logsRouter)
 
 
 app.use(function (req, res, next) {

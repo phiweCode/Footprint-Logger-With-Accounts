@@ -1,7 +1,5 @@
-const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const passport = require('passport');
 const { UserModel } = require('../models/userSchema');
 const { getUser, createUser, checkIfUserExists } = require('../services/userServices');
 const dotenv = require('dotenv');
@@ -13,7 +11,7 @@ dotenv.config({
 
 
 //Login controller and utility functions
-const signAccessToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+const signAccessToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '5m' });
 const signRefreshToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
 const userLoginController = async (req, res) => {
@@ -46,18 +44,26 @@ const userLoginController = async (req, res) => {
     res.cookie("jwt", accessToken, {
       httpOnly: false,
       sameSite: "lax",
-      secure: false,
-      maxAge: 15 * 60 * 1000
+      secure: process.env.NODE_ENV == "production",
+      path: '/',
+      maxAge: 5 * 60 * 1000
     });
 
     res.cookie("refresh", refreshToken, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV == "production",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    return res.json({ message: "Logged in" });
+    return res.json({
+      message: "Logged in", 
+      user: { 
+        id: user._id, 
+      }
+
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Server error"});
@@ -107,7 +113,14 @@ const createUserController = async (req, res) => {
       error: error.message
     })
   }
-}; 
+};  
+
+//check session 
+const checkSession = async (req, res) => { 
+  return res.status(200).json({
+    message: "Is in session"
+  })
+}
 
 //logout 
 const logoutController = async (req, res) => {
@@ -123,29 +136,68 @@ const logoutController = async (req, res) => {
 
     res.cookie('refresh', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV = "production", 
-      sameSite: 'none',
+      secure: process.env.NODE_ENV == "production", 
+      sameSite: 'lax',
       path: '/',
       expires: new Date(0)
     });
 
-    res.cookie('jwt', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV = "production", 
-      sameSite: 'none',
+
+    res.cookie("jwt",null, {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV == "production",
       path: '/',
-      expires: new Date(0)
+      maxAge: new Date(0)
     });
 
     return res.status(200).json({ message: 'Logged out successfully' });
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
-};
+}; 
+
+//refresh token controller  
+const refreshTokenController = async (req, res) => { 
+  const {refresh} = req.cookies
+  if(!refresh) return res.status(401).json({
+    message: "Unauthorized"
+  }) 
+
+  try {
+      const decodedRefresh = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET); 
+      const user = await UserModel.findOne({_id: decodedRefresh.sub}); 
+      
+      if(!user) return res.status(401).json({ 
+        message: "Bad credentials."
+      }) 
+
+      const newAccess = signAccessToken(user); 
+      res.cookie('jwt', newAccess ,{ 
+        httpOnly: false, 
+        sameSite: "lax", 
+        path: "/",
+        secure: process.env.NODE_ENV == "production",
+        maxAge: 1 * 60 * 1000
+      })
+
+      return res.status(200).json({
+        ok: true, 
+        userId: user._id
+      })
+
+  } catch (error) {
+   return res.status(403).json({ 
+    ok: false, 
+    message: "Unauthorized request."
+   })
+  }
+}
 
 
 module.exports = {
   userLoginController, 
   createUserController, 
-  logoutController
+  logoutController, 
+  refreshTokenController,
 }

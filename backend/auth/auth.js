@@ -5,8 +5,7 @@ const { UserModel } = require('../models/userSchema')
 
 passport.use(new JWTStrategy(options, async(jwtPayload, done)=>{ 
     try {
-        const user = await UserModel.find({id: jwtPayload.sub}) 
-
+        const user = await UserModel.findOne({_id: jwtPayload.sub})
         if(!user) return done(null, false)
         return done(null, user); 
 

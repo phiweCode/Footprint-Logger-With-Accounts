@@ -1,0 +1,7 @@
+POST http://localhost:3001/log/dashboard
+Content-Type: application/json 
+Authorization: "Bearer eyJzdWIiOiI2OGM2ZTM1NGY1ZmRhNDg0NTA3OGM2MGQiLCJpYXQiOjE3NTgxNjE4MzYsImV4cCI6MTc1ODE2MjEzNn0.ZzmfqjxUltMR2MLgXN9ZwJnGQY09JfWQf2o7bW0meFE"
+
+{ 
+    "userId": "68c6e354f5fda4845078c60d"
+}
