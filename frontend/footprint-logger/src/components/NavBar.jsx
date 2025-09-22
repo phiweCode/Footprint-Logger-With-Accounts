@@ -2,13 +2,16 @@ import axios from "axios";
 import React from "react";
 import { NavLink, useNavigate } from "react-router";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
+import logo from './carbon_footprint_logo.png'; 
+import { backendApi } from "../lib/utils";
+
 
 function NavBar() {
 
       const navigate = useNavigate()
       const handleSubmit = async () => {
         try {
-          const res = await axios.post(`${BACKEND_URL}auth/sign_out`, null, { withCredentials: true }); 
+          const res = await backendApi.post(`auth/sign_out`, null, { withCredentials: true }); 
           console.log("From logout",res)
           navigate('/sign_in');
         } catch (err) {
@@ -17,14 +20,14 @@ function NavBar() {
       };
 
   return (
-    <nav className="sticky top-0 grid grid-cols-3 justify-between items-center bg-blue-900 text-white font-blank  w-full p-5">
+    <nav className="   grid grid-cols-3 justify-between items-center text-black font-blank  w-full p-5">
       {/**Logo */}
-      <div className="logo">
-        <h1>Footprint Logger</h1>
+      <div className="logo ">
+          <img src={logo} alt="Logo" className="w-10 h-auto" />
       </div>
 
       {/** links */}
-      <ul className="links flex justify-between">
+      <ul className="links flex justify-between text-gray-900 font-normal items-center h-full ">
         <NavLink to='/activities'>
           <li className="links">Activities</li>
         </NavLink>

@@ -50,6 +50,7 @@ const router = createBrowserRouter([
                 children: [
                     {   
                         index: true,
+                        middleware: [authMiddleware],
                         path: 'sign_in', 
                         Component: SignIn, 
                         action: signInAction

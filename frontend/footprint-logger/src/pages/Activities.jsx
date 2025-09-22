@@ -3,8 +3,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useActionData, useLoaderData, NavLink, useSubmit } from "react-router";
-import { success, z } from "zod";
-import { userContext } from "../context/context";
+import { z } from "zod";
+import { userContext } from "../context/context"; 
+import { backendApi } from "../lib/utils";
 
 
 const formSchema = z.object({
@@ -17,27 +18,19 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const activitiesAction = async ({ request, context }) => {
     const formData = await request.formData(); 
-    const {userId, token} = context.get(userContext); 
+    //const {userId, token} = context.get(userContext); 
  //   console.log("context", userId, token)
     const category = formData.get("category"); 
     const activityType = formData.get('activityType'); 
     const quantity = formData.get('quantity') 
 
     try {
-        const res = await axios.post(`${BACKEND_URL}log/activity_log`, {
-            userId, 
+        const res = await backendApi("log/activity_log", {
             category, 
             mode: activityType, 
             quantity
         }, { 
-                 
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": "Bearer " + token
-            },
-            withCredentials: true, 
-        
-            
+            withCredentials: true,  
         }) 
 
         const data = res.data 
@@ -56,7 +49,7 @@ export const activitiesAction = async ({ request, context }) => {
 
 export const activitiesLoader = async () => {
   try {
-    const res = await axios.get(`${BACKEND_URL}carbon/emission_factors`);
+    const res = await backendApi("carbon/emission_factors");
     const { data } = res.data;
     return { success: true, data };
   } catch (error) {

@@ -1,11 +1,11 @@
 const express = require('express'); 
-const passport = require('../auth/auth'); 
+const authenticate = require('../auth/authMiddleware'); 
 const { userLogController, getUserLogsController, getDashboardDataController} = require('../controllers/userLogsControllers')
 
 const router = express.Router(); 
 
-router.post('/activity_log', passport.authenticate('jwt', {session: false}) , userLogController); 
-router.post('/user_logs', passport.authenticate('jwt', {session: false}) , getUserLogsController); 
-router.post('/dashboard', passport.authenticate('jwt', {session: false}) , getDashboardDataController); 
+router.get('/activity_log', authenticate , userLogController); 
+router.get('/user_logs', authenticate , getUserLogsController); 
+router.get('/dashboard', authenticate , getDashboardDataController); 
 
 module.exports = router; 

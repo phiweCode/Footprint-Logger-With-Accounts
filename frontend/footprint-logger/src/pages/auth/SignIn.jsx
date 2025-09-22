@@ -3,11 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useSubmit } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';  
-import axios from 'axios'; 
-
-
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
+import { backendApi } from '../../lib/utils';
 
 const formSchema = z.object({ 
   email: z.email({ 
@@ -24,14 +20,28 @@ export const signInAction = async ({ params, request }) => {
   const password = formData.get("password");
 
   try {
-    const res = await axios.post(
-      `${BACKEND_URL}auth/sign_in`,
+    const res = await backendApi.post(
+      `auth/sign_in`,
       { email, password },
       {
         headers: { "Content-Type": "application/json" },
         withCredentials: true, 
       }
-    );
+    ); 
+
+    const { accessToken } = res.data; 
+    
+    if(accessToken){ 
+      backendApi.accessToken = accessToken; 
+
+      backendApi.interceptors.request.use(config=>{ 
+        const token = config.accessToken ?? backendApi.accessToken; 
+        config.headers['Authorization'] = `Bearer ${token}`;
+        return config
+      })
+    }
+
+    console.log("From login: ", res)
 
     return  redirect('/dashboard')
 

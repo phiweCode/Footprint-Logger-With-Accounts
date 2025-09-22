@@ -1,14 +1,51 @@
 import axios from 'axios';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
+
+export const backendApi = axios.create({
+  baseURL: BACKEND_URL,
+}) 
+
+backendApi.accessToken = null; 
+
+backendApi.interceptors.response.use(res=>res, 
+  async (err)=>{ 
+
+    const originalRequest = err.config; 
+
+    if(err.response.status == 401 && !originalRequest._retry){
+
+      originalRequest._retry = true
+
+      const refreshResponse = await axios(`${BACKEND_URL}auth/refresh`, {withCredentials: true}); 
+      
+      const {accessToken} = refreshResponse.data; 
+
+      console.log("Access token from refresh Interceptor", accessToken)
+
+      originalRequest.headers['Authorization'] = `Bearer ${accessToken}`; 
+
+      backendApi.accessToken = accessToken; 
+
+      console.log("Updated backend Api access token", backendApi.accessToken,"\n\n\n" ,originalRequest.headers.Authorization)
+
+      return backendApi(originalRequest); 
+    }
+
+    if(err.response.status === 401) 
+
+    return Promise.reject(err); 
+  }
+)
 
 export const getUserId = async () => {
     try {
-        const res = await axios.post(`${BACKEND_URL}auth/refresh`, null, {
-            withCredentials: true
-        });
-        const data = res.data
-        if (data?.ok) return data.userId;
-        return null;
+
+      const res = await backendApi(`auth/check`, {
+        withCredentials: true
+      });
+      const data = res.data
+      console.log("In the middleware utility: ", backendApi.accessToken) 
+      if (data?.ok) return
     } catch (error) {
         return null
     }
@@ -29,11 +66,14 @@ export const buildAreaChart = (data) => {
           label: category,
           data: filtered.map(i => i.quantity),
           backgroundColor: [
-            "rgb(255, 99, 132)",
-            "rgb(75, 192, 192)",
-            "rgb(255, 205, 86)",
-            "rgb(201, 203, 207)",
-            "rgb(54, 162, 235)",
+        "rgb(85, 107, 47)",
+        "rgb(143, 163, 30)",
+        "rgb(198, 216, 112)",
+        "rgb(239, 245, 210)",
+        "rgb(120, 200, 65)",
+        "rgb(180, 229, 13)",
+        "rgb(255, 155, 47)",
+        "rgb(251, 65, 65)",
           ],
         },
       ],

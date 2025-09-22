@@ -1,4 +1,4 @@
-import React from 'react'
+import FormComponent from '../components/FormComponent'
 
 export const reportsLoader = async ({ context }) => { 
   return 
@@ -7,7 +7,7 @@ export const reportsLoader = async ({ context }) => {
 function Reports() {
   return (
     <div>
-      <h1>Reports</h1>
+      <FormComponent />
     </div>
   )
 }

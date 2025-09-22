@@ -13,7 +13,8 @@ dotenv.config({
 
 const userLogController = async (req, res) => {
   try {
-    const { userId, category, mode, quantity } = req.body;
+    const userId = req.user;
+    const { category, mode, quantity } = req.body;
 
     if (!userId || !category || !mode || !quantity)
       return res.status(400).json({
@@ -42,7 +43,7 @@ const userLogController = async (req, res) => {
 
 const getUserLogsController = async (req, res) => {
   try {
-    const { userId } = req.body;
+     const userId = req.user;
     const userLogs = await getUserLogs({ userId });
 
     if (!userLogs)
@@ -63,7 +64,7 @@ const getUserLogsController = async (req, res) => {
 
 const getDashboardDataController = async (req, res) => {
   try {
-    const { userId } = req.body;
+     const userId = req.user;
 
     if (!userId)
       return res.status(400).json({

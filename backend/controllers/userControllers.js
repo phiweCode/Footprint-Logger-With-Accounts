@@ -11,7 +11,7 @@ dotenv.config({
 
 
 //Login controller and utility functions
-const signAccessToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '5m' });
+const signAccessToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET);
 const signRefreshToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
 const userLoginController = async (req, res) => {
@@ -61,8 +61,8 @@ const userLoginController = async (req, res) => {
       message: "Logged in", 
       user: { 
         id: user._id, 
-      }
-
+      }, 
+      accessToken
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -113,14 +113,7 @@ const createUserController = async (req, res) => {
       error: error.message
     })
   }
-};  
-
-//check session 
-const checkSession = async (req, res) => { 
-  return res.status(200).json({
-    message: "Is in session"
-  })
-}
+};
 
 //logout 
 const logoutController = async (req, res) => {
@@ -165,8 +158,13 @@ const refreshTokenController = async (req, res) => {
   }) 
 
   try {
-      const decodedRefresh = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET); 
-      const user = await UserModel.findOne({_id: decodedRefresh.sub}); 
+      jwt.verify(refresh, process.env.JWT_REFRESH_SECRET, async (err, decoded)=>{
+
+      if(err) return res.status(401).json({ 
+        message: "Invalid refresh token."
+      })
+
+      const user = await UserModel.findOne({_id: decoded.sub}); 
       
       if(!user) return res.status(401).json({ 
         message: "Bad credentials."
@@ -183,13 +181,14 @@ const refreshTokenController = async (req, res) => {
 
       return res.status(200).json({
         ok: true, 
-        userId: user._id
+        userId: user._id, 
+        accessToken: newAccess
       })
-
+      }); 
+  
   } catch (error) {
-   return res.status(403).json({ 
-    ok: false, 
-    message: "Unauthorized request."
+   return res.status(500).json({ 
+    message: "Server error occurred."
    })
   }
 }
