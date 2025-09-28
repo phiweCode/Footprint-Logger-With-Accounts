@@ -7,6 +7,8 @@ var logger = require('morgan');
 var cors = require('cors'); 
 var passport = require('./auth/auth')
 
+require('dotenv').config()
+
 var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
@@ -14,7 +16,7 @@ app.set('view engine', 'jade');
 
 //Middleware
 app.use(cors({ 
-  origin: "http://localhost:3002",
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }))
 app.use(logger('dev'));
@@ -58,7 +60,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(3001, () => {
-  console.log("The app is live")
+  console.log("The app is live", process.env.FRONTEND_URL)
 })
 
 module.exports = app;
