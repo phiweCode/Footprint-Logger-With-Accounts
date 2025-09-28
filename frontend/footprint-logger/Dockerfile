@@ -1,5 +1,5 @@
 # ── Stage 1: Build ──────────────────────────────────────────
-FROM node:20-alpine AS build
+FROM node:current-alpine3.21 AS build
 
 # set working directory
 WORKDIR /app
