@@ -11,6 +11,10 @@ export default defineConfig({
       "@": path.resolve(__dirname)
     }
   },
+  build: { 
+    outDir: 'dist'
+  },
+  base: "/",
   server: { 
     port: 3002
   }
