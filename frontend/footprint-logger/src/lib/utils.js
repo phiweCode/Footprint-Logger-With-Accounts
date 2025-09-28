@@ -10,9 +10,13 @@ backendApi.accessToken = null;
 backendApi.interceptors.response.use(res=>res, 
   async (err)=>{ 
 
+     if (!err.response) {
+      return Promise.reject(err);
+    }
+
     const originalRequest = err.config; 
 
-    if(err.response.status == 401 && !originalRequest._retry){
+    if(err.response?.status == 401 && !originalRequest._retry){
 
       originalRequest._retry = true
 
@@ -20,18 +24,18 @@ backendApi.interceptors.response.use(res=>res,
       
       const {accessToken} = refreshResponse.data; 
 
-      console.log("Access token from refresh Interceptor", accessToken)
+
 
       originalRequest.headers['Authorization'] = `Bearer ${accessToken}`; 
 
       backendApi.accessToken = accessToken; 
 
-      console.log("Updated backend Api access token", backendApi.accessToken,"\n\n\n" ,originalRequest.headers.Authorization)
+
 
       return backendApi(originalRequest); 
     }
 
-    if(err.response.status === 401) 
+    if(err.response?.status === 401) 
 
     return Promise.reject(err); 
   }
@@ -44,7 +48,7 @@ export const getUserId = async () => {
         withCredentials: true
       });
       const data = res.data
-      console.log("In the middleware utility: ", backendApi.accessToken) 
+
       if (data?.ok) return
     } catch (error) {
         return null
@@ -53,7 +57,10 @@ export const getUserId = async () => {
 
 export const buildAreaChart = (data) => {
   const dataSets = [];
-  const categories = [...new Set(data.map(i => i.category))];
+
+  if(data)
+  {
+      const categories = [...new Set(data.map(i => i.category))];
 
   categories.forEach(category => {
     const filtered = data.filter(i => i.category === category);
@@ -87,6 +94,7 @@ export const buildAreaChart = (data) => {
 
     dataSets.push(setup);
   });
+  }
 
-  return dataSets;
+  return dataSets || [];
 };

@@ -36,7 +36,7 @@ export const options = {
 };
 
 function WeeklyContributions({ ...props }) {
-  const { data } = props;
+  const { data = []} = props ?? {};
   // console.log("Weekly", data.map(dat))
   const labels = data.map((dates) => dates._id);
   const chartConfigs = {

@@ -1,26 +1,25 @@
-import { redirect } from "react-router";
 import { backendApi } from "../lib/utils";
 import { isLoggedIn } from "../context/context";
 
-export const authMiddleware = async ({ context }) => {
+export const appMiddleware = async ({ context }) => {
     try {
         backendApi.interceptors.request.use(config => {
             const token = config.accessToken ?? backendApi.accessToken;
             config.headers['Authorization'] = `Bearer ${token}`;
             return config
         }) 
-        await backendApi("auth/check", { withCredentials: true })
+        await backendApi("auth/check", { withCredentials: true });
         context.set(isLoggedIn, {session: true})
     } catch (error) { 
-         if (error.code === 'ERR_NETWORK') {
+           if (error.code === 'ERR_NETWORK') {
             console.log('Target service is down');
-            throw Error(error.message)
+            throw new Error(error.message)
         } else {
-            console.log("Auth middle catch-all", error.code, error.message)
             context.set(isLoggedIn, {session: false})
-            throw redirect('/sign_in');
+            //throw redirect('/sign_in');
         }
-        
+        // context.set(isLoggedIn, {session: false}); 
+        //  throw redirect('/sign_in');
     }
 }
 

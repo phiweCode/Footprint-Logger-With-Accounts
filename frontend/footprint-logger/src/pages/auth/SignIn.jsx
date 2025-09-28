@@ -4,6 +4,7 @@ import { useSubmit } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';  
 import { backendApi } from '../../lib/utils';
+import { LoginForm } from '@/components/login-form';
 
 const formSchema = z.object({ 
   email: z.email({ 
@@ -29,7 +30,9 @@ export const signInAction = async ({ params, request }) => {
       }
     ); 
 
-    const { accessToken } = res.data; 
+    console.log("Response, ", res)
+
+    const  accessToken = res?.data?.accessToken 
     
     if(accessToken){ 
       backendApi.accessToken = accessToken; 
@@ -59,7 +62,7 @@ function SignIn() {
   const actionData = useActionData(); 
   const signInSubmit = useSubmit();  
 
-  console.log(actionData)
+  //console.log(actionData)
 
   const { 
     register, 
@@ -71,6 +74,7 @@ function SignIn() {
   }); 
 
   const onSubmit = (data) =>{ 
+
     const formData = new FormData(); 
     Object.entries(data).forEach(([k,v])=>{ 
       formData.append(k,v)
@@ -81,8 +85,8 @@ function SignIn() {
 
 
   return (
-    <section className='flex items-center justify-center bg-green-600 h-screen '>
-      <div className="grid grid-rows-15 card-container lg:h-[60vh] bg-white min-w-[25vw] rounded-[5px] p-2 "> 
+    <section className='flex items-center justify-center h-screen '>
+      {/* <div className="grid grid-rows-15 card-container lg:h-[60vh] bg-white min-w-[25vw] rounded-[5px] p-2 "> 
         <div className="row-span-2 card-details"> 
           <h1 className="cart-title text-4xl text-center">
             Sign In
@@ -124,7 +128,9 @@ function SignIn() {
         <div className="row-span-3 text-center card-footer">
           Don&apos;t have an account? <NavLink to="/sign_up">Sign Up</NavLink> 
         </div>
-      </div>
+      </div> */}
+
+      <LoginForm actionData={actionData} errors={errors} register={register} handleSubmit={handleSubmit} onSubmit={onSubmit}/>
 
     </section>
   )

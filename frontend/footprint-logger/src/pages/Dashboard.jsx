@@ -60,22 +60,7 @@ export const dashboardLoader = async ({ context }) => {
 function Dashboard() {
   const loaderData = useLoaderData();
 
-  const { data, stats, lastWeekActivities, activityTotalsPerCategory } =
-    loaderData.resultsObject;
-  console.log(
-    "Data: ",
-    data,
-    "\n",
-    "Stats: ",
-    stats,
-    "\n",
-    "Last week's activities: ",
-    lastWeekActivities,
-    "\n",
-    "Activities totals per Category: ",
-    activityTotalsPerCategory[0],
-    "\n"
-  );
+  const { data = [], stats, lastWeekActivities, activityTotalsPerCategory } = loaderData.resultsObject ?? {};
 
   return (
     <section className="dashboard grid grid-rows-auto gap-50 items-center justify-center h-full w-full pt-10 pb-50">
@@ -89,27 +74,27 @@ function Dashboard() {
 
         <section className="stats grid grid-cols-3 gap-10.5 w-full">
           <article className="running-total">
-            <StatsCard title="Total Emissions" value={stats.runningTotal} />
+            <StatsCard title="Total Emissions" value={stats?.runningTotal} />
           </article>
           <article className="averageContribution">
             <StatsCard
               title="Total Average"
-              value={stats.averageContribution}
+              value={stats?.averageContribution}
             />
           </article>
           <article className="ratioAgainstCommunity">
             <StatsCard
               title="You Vs Community"
-              value={stats.ratioAgainstCommunity}
+              value={stats?.ratioAgainstCommunity}
             />
           </article>
         </section>
 
         <section className="visuals grid grid-cols-2 items-center justify-between w-full h-full gap-50">
-          <article className="weekly-review h-full w-full flex flex-cols items-center justify-start max-w-[600px]">
+          <article className="weekly-review h-full w-full flex flex-cols items-center justify-start max-w-[400px]">
             <WeeklyContributions data={lastWeekActivities} />
           </article>
-          <article className="category-analysis h-full w-full flex flex-cols items-center float-end  max-w-[600px] justify-end">
+          <article className="category-analysis h-full w-full flex flex-cols items-center float-end  max-w-[400px] justify-end">
             <CategoryAnalysis data={activityTotalsPerCategory} />
           </article>
         </section>
@@ -129,7 +114,7 @@ function Dashboard() {
         </thead>
 
         <tbody>
-          {data &&
+          {(data.length !== 0) &&
             data.map((td) => {
               const { category, mode, estimatedContribution, createdAt } = td;
               return (

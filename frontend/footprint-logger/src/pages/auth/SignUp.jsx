@@ -1,3 +1,15 @@
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -50,7 +62,7 @@ export const signUpAction = async ({ request }) => {
   }
 };
 
-function SignUp() {
+function SignUp({ className, ...props }) {
   const actionData = useActionData();
   const signUpSubmit = useSubmit();
 
@@ -74,84 +86,98 @@ function SignUp() {
   };
 
   return (
-    <section className="flex items-center justify-center bg-green-600 h-screen ">
-      <div className="grid grid-rows-15 card-container lg:h-[60vh] bg-white min-w-[25vw] rounded-[5px] p-2 ">
-        <div className="row-span-2 card-details">
-          <h1 className="cart-title text-4xl text-center">Sign In</h1>
-          <p className="card-description text-center pt-4">
-            welcome back to footprint logger !
-          </p>
-        </div>
+    <section className="flex items-center justify-center  h-screen ">
 
-        <div className="row-span-10 flex items-center w-full h-full card-content justify-center">
-          <form
-            action=" "
-            className="grid grid-rows-18 w-full p-15"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <article className="flex flex-col  items-start  gap-2 row-span-4">
-              <label htmlFor="firstName">First Name</label>
-              <input
-                type="text"
-                {...register("firstName")}
-                placeholder="Enter your first name."
-                className="border border-blue-900 p-2 w-full"
-              />
-              {errors.firstName && (
-                <p className="text-red-600">{errors.firstName.message}</p>
-              )}
-            </article>
 
-            <article className="flex flex-col  items-start  gap-2 row-span-4">
-              <label htmlFor="lastName">Last Name</label>
-              <input
-                type="text"
-                {...register("lastName")}
-                placeholder="Enter your last name"
-                className="border border-blue-900 p-2 w-full"
-              />
-              {errors.lastName && (
-                <p className="text-red-600">{errors.lastName.message}</p>
-              )}
-            </article>
-            <article className="flex flex-col  items-start  gap-2 row-span-4">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                placeholder="Enter your email"
-                className="border border-blue-900 p-2 w-full"
-              />
-              {errors.email && (
-                <p className="text-red-600">{errors.email.message}</p>
-              )}
-            </article>
-
-            <article className="flex flex-col  items-start  gap-2 row-span-4">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                {...register("password")}
-                placeholder="Enter your password"
-                className="border border-blue-900 p-2 w-full"
-              />
-              {errors.password && (
-                <p className="text-red-600">{errors.password.message}</p>
-              )}
-              {actionData?.success ? actionData?.message : actionData?.message}
-            </article>
-            <article className="row-span-2 button-wrapper flex justify-center h-full pt-1">
-              <button type="submit" className="bg-black text-white w-full h-8">
+          <div className={cn("flex flex-col gap-6 lg:min-w-[20vw]", className)} {...props}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Login to your account</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-3">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="first-name"
+                  type="text"
+                  {...register("firstName")}
+                  placeholder="e.g, Thabo"
+                  required
+                />
+                {errors.firstName && (
+                  <p className="text-red-500">{errors.firstName.message}</p>
+                )}
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="last-name"
+                  type="text"
+                  {...register("lastName")}
+                  placeholder="e.g, Mngoma"
+                  required
+                />
+                {errors.lastName && (
+                  <p className="text-red-500">{errors.lastName.message}</p>
+                )}
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  {...register("email")}
+                  placeholder="m@example.com"
+                  required
+                />
+                {errors.email && (
+                  <p className="text-red-500">{errors.email.message}</p>
+                )}
+              </div>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  {/* <a
+                    href="#"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </a> */}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  required
+                />
+                {errors.password && (
+                  <p className="text-red-500">{errors.password.message}</p>
+                )}
+                {!actionData?.success && (
+                  <p className="text-red-600">{actionData?.message}</p>
+                )}
+              </div>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" className="w-full">
+                  Sign Up
+                </Button>
+              </div>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <NavLink to="/sign_in" className="underline underline-offset-4">
                 Sign In
-              </button>
-            </article>
+              </NavLink>
+            </div>
           </form>
-        </div>
-
-        <div className="row-span-3 text-center card-footer">
-          Already have an account? <NavLink to="/sign_in">Sign In</NavLink>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+    </div>
     </section>
   );
 }

@@ -4,7 +4,7 @@ const { userLogController, getUserLogsController, getDashboardDataController} = 
 
 const router = express.Router(); 
 
-router.get('/activity_log', authenticate , userLogController); 
+router.post('/activity_log', authenticate , userLogController); 
 router.get('/user_logs', authenticate , getUserLogsController); 
 router.get('/dashboard', authenticate , getDashboardDataController); 
 

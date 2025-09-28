@@ -1,59 +1,209 @@
-import axios from "axios";
-import React from "react";
-import { NavLink, useNavigate } from "react-router";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;  
-import logo from './carbon_footprint_logo.png'; 
+import { NavLink, useNavigate, useSubmit } from "react-router";
+import logo from "./carbon_footprint_logo.png";
 import { backendApi } from "../lib/utils";
 
+function NavBar({ ...props }) {
+  const { isLoggedIn } = props;
+  const navigate = useNavigate();
+  const signOutOfContext = useSubmit();
 
-function NavBar() {
-
-      const navigate = useNavigate()
-      const handleSubmit = async () => {
-        try {
-          const res = await backendApi.post(`auth/sign_out`, null, { withCredentials: true }); 
-          console.log("From logout",res)
-          navigate('/sign_in');
-        } catch (err) {
-          console.error(err);
-        }
-      };
+  const handleSubmit = async () => {
+    try {
+      const res = await backendApi.post(`auth/sign_out`, null, {
+        withCredentials: true,
+      });
+      backendApi.accessToken = null;
+      console.log("From logout", res);
+      navigate("/sign_in");
+    } catch (err) {
+      backendApi.accessToken = null;
+      console.error(err);
+    }
+  };
 
   return (
-    <nav className="   grid grid-cols-3 justify-between items-center text-black font-blank  w-full p-5">
-      {/**Logo */}
-      <div className="logo ">
-          <img src={logo} alt="Logo" className="w-10 h-auto" />
-      </div>
+    <>
+      <header className="bg-white">
+        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="md:flex md:items-center md:gap-12">
+              <NavLink className="block text-teal-600" to="/">
+                <span className="sr-only">Home</span>
+                <img src={logo} className="w-10 h-auto" />
+              </NavLink>
+            </div>
 
-      {/** links */}
-      <ul className="links flex justify-between text-gray-900 font-normal items-center h-full ">
-        <NavLink to='/activities'>
-          <li className="links">Activities</li>
-        </NavLink>
-        <NavLink  to='/dashboard' >
-          <li className="links">Dashboard</li>
-        </NavLink>
-        <NavLink  to='/reports' >
-          <li className="links">Reports</li>
-        </NavLink>
-        <NavLink  to='/leaderboard' >
-          <li className="links">Leaderboard</li>
-        </NavLink>
-      </ul>
+            <div className="hidden md:block">
+              <nav aria-label="Global">
+                <ul className="flex items-center gap-6 text-sm">
+                  <li>
+                    <NavLink
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      to="/"
+                    >
+                      Home{" "}
+                    </NavLink>
+                  </li>
 
-      {/**Utils */}
-      <div className="utils flex justify-end">
-        <NavLink to='/sign_in'
-          className="bg-white text-black min-w-20 rounded-15 text-center font-black"
-        >
-          Login
-        </NavLink> 
-        <button className="bg-white text-black font-black ml-5 px-2" onClick={handleSubmit}>
-          Sign out
-        </button>
-      </div>
-    </nav>
+                  <li>
+                    <NavLink
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      to="/activities"
+                    >
+                      {" "}
+                      Activities{" "}
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      to="/dashboard"
+                    >
+                      Dashboard{" "}
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      to="/reports"
+                    >
+                      Reports{" "}
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                      to="/leaderboard"
+                    >
+                      Leaderboard{" "}
+                    </NavLink>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {isLoggedIn.session === true ? (
+                <div className="sm:flex sm:gap-4">
+                  <NavLink
+                    className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm"
+                    to="/sign_in"
+                  >
+                    Login
+                  </NavLink>
+
+                  <div className="hidden sm:flex">
+                    <NavLink
+                      className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600"
+                      to="/sign_up"
+                    >
+                      Register
+                    </NavLink>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="block md:hidden">
+                    <button className="rounded-sm bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="size-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4 6h16M4 12h16M4 18h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="hidden md:relative md:block">
+                    <button
+                      type="button"
+                      className="overflow-hidden rounded-full border border-gray-300 shadow-inner"
+                    >
+                      <span className="sr-only">Toggle dashboard menu</span>
+
+                      <img
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt=""
+                        className="size-10 object-cover"
+                      />
+                    </button>
+
+                    <div
+                      className="absolute end-0 z-10 mt-0.5 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"
+                      role="menu"
+                    >
+                      <div className="p-2">
+                        <a
+                          href="#"
+                          className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          role="menuitem"
+                        >
+                          My profile
+                        </a>
+                      </div>
+
+                      <div className="p-2">
+                        <form onSubmit={handleSubmit}>
+                          <button
+                            type="submit"
+                            className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                            role="menuitem"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              className="size-4"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+                              />
+                            </svg>
+                            Logout
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* <div class="block md:hidden">
+                <button
+                  class="rounded-sm bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="size-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div> */}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
 
