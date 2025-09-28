@@ -31,4 +31,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Use a smaller command, avoids shell form
-CMD ["node", "server.js"]
+CMD ["node", "app.js"]
