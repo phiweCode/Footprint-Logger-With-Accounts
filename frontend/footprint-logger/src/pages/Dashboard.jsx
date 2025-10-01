@@ -1,18 +1,11 @@
-import { dashboardContext, userContext } from "../context/context";
-import axios from "axios";
 import { useLoaderData } from "react-router";
 import CategoryAnalysis from "../components/CategoryAnalysis";
 import WeeklyContributions from "../components/WeeklyContributions";
 import StatsCard from "../components/StatsCard";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 import { backendApi } from "../lib/utils";
 
 export const dashboardLoader = async ({ context }) => {
-  //const { userId, token } = context.get(userContext);
-
-
     try {
       const res = await backendApi(
         "log/user_logs",
@@ -28,11 +21,7 @@ export const dashboardLoader = async ({ context }) => {
         }
       );
 
-      console.log("Dashboard data", dashboardData);
-
-      const { stats, lastWeekActivities, activityTotalsPerCategory } =
-        dashboardData.data.data;
-     // context.set(dashboardContext, dashboardData.data.data);
+      const { stats, lastWeekActivities, activityTotalsPerCategory } = dashboardData.data.data;
       const { data } = res.data;
 
       const resultsObject = {
@@ -52,9 +41,6 @@ export const dashboardLoader = async ({ context }) => {
         message: error.response?.data.message,
       };
     }
-  
-
-  return;
 };
 
 function Dashboard() {
@@ -63,34 +49,26 @@ function Dashboard() {
   const { data = [], stats, lastWeekActivities, activityTotalsPerCategory } = loaderData.resultsObject ?? {};
 
   return (
-    <section className="dashboard grid grid-rows-auto gap-50 items-center justify-center h-full w-full pt-10 pb-50">
-      <article className="quick-access grid grid-rows-auto h-full gap-5">
-        <section className="grid grid-rows-2 justify-start w-full min-h-[15vh]">
-          <h1 className="font-medium text-4xl">Your carbon footprint</h1>
-          <p className="text-gray-400">
-            Track your environmental impact and make a difference.{" "}
+    <section className="dashboard w-full min-h-screen md:p-10 mt-25">
+      <article className="quick-access space-y-10 px-75">
+        {/* header */}
+        <header className="space-y-2">
+          <h1 className="font-medium text-3xl md:text-4xl">
+            Your carbon footprint
+          </h1>
+          <p className="text-gray-500 text-sm md:text-base">
+            Track your environmental impact and make a difference.
           </p>
+        </header>
+
+        {/* stats cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 ">
+          <StatsCard title="Total Emissions" value={stats?.runningTotal} />
+          <StatsCard title="Total Average" value={stats?.averageContribution} />
+          <StatsCard title="You Vs Community" value={stats?.ratioAgainstCommunity} />
         </section>
 
-        <section className="stats grid grid-cols-3 gap-10.5 w-full">
-          <article className="running-total">
-            <StatsCard title="Total Emissions" value={stats?.runningTotal} />
-          </article>
-          <article className="averageContribution">
-            <StatsCard
-              title="Total Average"
-              value={stats?.averageContribution}
-            />
-          </article>
-          <article className="ratioAgainstCommunity">
-            <StatsCard
-              title="You Vs Community"
-              value={stats?.ratioAgainstCommunity}
-            />
-          </article>
-        </section>
-
-        <section className="visuals grid grid-cols-2 items-center justify-between w-full h-full gap-50">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-60">
           <article className="weekly-review h-full w-full flex flex-cols items-center justify-start max-w-[400px]">
             <WeeklyContributions data={lastWeekActivities} />
           </article>
@@ -100,34 +78,32 @@ function Dashboard() {
         </section>
       </article>
 
-      <table className="table-auto border-collapse border border-gray-400 p-24 mb-50 bg-blue-300">
-        <caption class="caption-top">
-          Table 3.1: Professional wrestlers and their signature moves.
-        </caption>
-        <thead className="min-h-[20vh]">
-          <tr className="text-start">
-            <th className="text-start">Category</th>
-            <th className="text-start">Mode</th>
-            <th className="text-start">quantity</th>
-            <th className="text-start">Date</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {(data.length !== 0) &&
-            data.map((td) => {
-              const { category, mode, estimatedContribution, createdAt } = td;
-              return (
-                <tr className="text-start">
-                  <td>{category}</td>
-                  <td>{mode}</td>
-                  <td>{estimatedContribution}</td>
-                  <td>{createdAt}</td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
+       {/* table */}
+      <div className="mt-12 overflow-x-auto px-100">
+        <table className="table-auto w-full border border-gray-300 text-left">
+          <caption className="caption-top mb-2 font-medium">
+            Table 3.1: Professional wrestlers and their signature moves.
+          </caption>
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2">Category</th>
+              <th className="p-2">Mode</th>
+              <th className="p-2">Quantity</th>
+              <th className="p-2">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map(({ category, mode, estimatedContribution, createdAt }, i) => (
+              <tr key={i} className="even:bg-gray-50">
+                <td className="p-2">{category}</td>
+                <td className="p-2">{mode}</td>
+                <td className="p-2">{estimatedContribution}</td>
+                <td className="p-2">{createdAt}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

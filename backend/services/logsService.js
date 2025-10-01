@@ -1,5 +1,4 @@
-const { format } = require("morgan");
-const { GHGLogsModel, UserModel } = require("../models/userSchema");
+const { GHGLogsModel } = require("../models/userSchema");
 const mongoose = require('mongoose')
 
 const createLog = async ({ logDetails }) => {
@@ -82,7 +81,7 @@ const getAggregatedLogs = async ({ userId }) => {
 const getActivityTotalPerCategory = async ({ userId }) => {
   try {
     const result = await GHGLogsModel.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(userId)} },
+      { $match: { user: new mongoose.Types.ObjectId(userId) } },
       {
         $facet: {
 
@@ -118,50 +117,97 @@ const getActivityTotalPerCategory = async ({ userId }) => {
   }
 }
 
-const getWeeklyActivities = async ({userId}) => {
+const getWeeklyActivities = async ({ userId }) => {
   try {
     const lastWeekActivities = new Date();
     lastWeekActivities.setDate(lastWeekActivities.getDate() - 7);
 
     const results = await GHGLogsModel.aggregate([
-     { $match: { 
-        user: new mongoose.Types.ObjectId(userId),
-        createdAt: { 
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(userId),
+          createdAt: {
             $gte: lastWeekActivities
+          }
         }
-      }}, { 
+      }, {
         $project: {
-          estimatedContribution: 1, 
+          estimatedContribution: 1,
           date: {
-            $dateToString: { 
-              format: "%Y-%m-%d", 
+            $dateToString: {
+              format: "%Y-%m-%d",
               date: "$createdAt"
             }
           }
         }
-      },{ 
-        $group: { 
-          _id: "$date", 
-          totalQuantity: { 
-              $sum: "$estimatedContribution"
+      }, {
+        $group: {
+          _id: "$date",
+          totalQuantity: {
+            $sum: "$estimatedContribution"
           }
         }
       }
-    ]); 
+    ]);
 
-    return results; 
+    return results;
+
+  } catch (error) {
+    throw Error(error.message)
+  }
+} 
+
+const generateLeaderboard = async () => { 
+    
+   const pipeline = [
+      {
+        $group: {
+          _id: "$user",
+          totalEmissions: { $sum: "$estimatedContribution" }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: 0,
+          userId: "$user._id",
+          firstName: "$user.firstName",
+          lastName: "$user.lastName",
+          totalEmissions: 1
+        }
+      },
+      {
+        $setWindowFields: {
+          sortBy: { totalEmissions: 1 },
+          output: {
+            rank: { $rank: {} }
+          }
+        }
+      }
+    ];
+
+  try {
+     const rankedResults = await GHGLogsModel.aggregate(pipeline) 
+     return rankedResults; 
 
   } catch (error) {
     throw Error(error.message)
   }
 }
 
-
-
 module.exports = {
   createLog,
   getUserLogs,
   getAggregatedLogs,
-  getActivityTotalPerCategory, 
-  getWeeklyActivities
+  getActivityTotalPerCategory,
+  getWeeklyActivities, 
+  generateLeaderboard
 }

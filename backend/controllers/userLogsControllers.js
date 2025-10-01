@@ -5,6 +5,7 @@ const {
   getAggregatedLogs,
   getActivityTotalPerCategory,
   getWeeklyActivities,
+  generateLeaderboard,
 } = require("../services/logsService");
 
 dotenv.config({
@@ -87,10 +88,25 @@ const getDashboardDataController = async (req, res) => {
       message: "Server error" + error.message,
     });
   }
-};
+}; 
+
+
+const getLeaderboardData = async (req, res) => {
+  try {
+    const leaderBoardData = await generateLeaderboard(); 
+    return res.status(200).json(
+     { data: leaderBoardData }
+    )
+  } catch (error) {
+    return res.status(500).json({ 
+      message: "Server error."
+    })
+  }
+}
 
 module.exports = {
   userLogController,
   getUserLogsController,
   getDashboardDataController,
+  getLeaderboardData
 };

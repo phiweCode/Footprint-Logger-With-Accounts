@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { UserModel } = require('../models/userSchema');
-const { getUser, createUser, checkIfUserExists } = require('../services/userServices');
+const { getUser, createUser, checkIfUserExists,} = require('../services/userServices');
 const dotenv = require('dotenv');
+const { token } = require('morgan');
 
 
 dotenv.config({
@@ -191,6 +192,18 @@ const refreshTokenController = async (req, res) => {
     message: "Server error occurred."
    })
   }
+} 
+
+//get user profile details  
+const getUserProfileDetails =  async (req, res) => { 
+  try {
+    //const authToken = req.cookies.headers["Authorization"]; 
+    const userId = req.user 
+    const users = await getUser({userId, email})
+    return res.status(200).json(users)
+  } catch (error) {
+    throw Error(error.message)
+  }
 }
 
 
@@ -199,4 +212,5 @@ module.exports = {
   createUserController, 
   logoutController, 
   refreshTokenController,
+  getUserProfileDetails
 }

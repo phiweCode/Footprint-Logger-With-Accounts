@@ -8,14 +8,17 @@ const getUsers = async () => {
   } catch (error) {
     throw Error(error.message);
   }
-}; 
+};
 
-const checkIfUserExists = async ({email}) => await UserModel.exists({email});
+const checkIfUserExists = async ({ email }) => await UserModel.exists({ email });
 
-
-const getUser = async ({ email }) => {
+const getUser = async ({userId, email }) => {
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({$or: [
+      {_id: userId}, { 
+        email: email
+      }
+    ]})
 
     return user;
   } catch (error) {
@@ -25,7 +28,7 @@ const getUser = async ({ email }) => {
 
 const getGHGLogs = async () => {
   try {
-    const logs = await GHGLogsModel.find({});
+    const logs = await GHGLogsModel.find();
 
     if (!logs)
       return {
@@ -36,22 +39,21 @@ const getGHGLogs = async () => {
   } catch (error) {
     throw Error(error.message);
   }
-}; 
+};
 
-const createUser = async ({newUser}) => { 
-      try {
+const createUser = async ({ newUser }) => {
+  try {
 
-        return await UserModel.create(newUser);
-      } catch (error) {
-        throw Error(error.message)
-      }
-} 
-
+    return await UserModel.create(newUser);
+  } catch (error) {
+    throw Error(error.message)
+  }
+}
 
 module.exports = {
   getUser,
   getUsers,
   getGHGLogs,
-  createUser, 
+  createUser,
   checkIfUserExists
 };

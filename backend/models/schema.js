@@ -1,4 +1,4 @@
-const { mongoose, connectDB } = require('../database/db');
+const { mongoose } = require('../database/db');
 const { Schema } = mongoose;
 
 //ch4_gwps
@@ -14,6 +14,7 @@ const CH4_gwp_Schema = new Schema({
     subsector: Number,
     subsector_title: String
 });
+
 const CH4_gwp_Model = mongoose.model('CH4_gwp', CH4_gwp_Schema, 'CH4_gwps');
 
 //data
@@ -104,8 +105,6 @@ const categorySchema = new mongoose.Schema({
 });
 
 const EmissionFactors = mongoose.model('emission_factor', categorySchema);
-
-
 
 module.exports = {
     CH4_gwp_Model,

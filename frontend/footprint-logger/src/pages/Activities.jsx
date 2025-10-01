@@ -176,100 +176,9 @@ function Activities() {
 
   return (
     <section className="flex items-center justify-center  h-screen">
-      {/* <div className="grid grid-rows-15 card-container lg:h-[60vh] bg-white min-w-[25vw] rounded-[5px] p-2">
-        <div className="row-span-2 card-details">
-          <h1 className="cart-title text-4xl text-center">
-            Log your Carbon Activity
-          </h1>
-          <p className="card-description text-center pt-4">
-            welcome back to footprint logger !
-          </p>
-        </div>
-
-        <div className="row-span-10 flex items-center w-full h-full card-content justify-center">
-          <form
-            className="grid grid-rows-auto w-full p-15"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <article className="flex flex-col items-start gap-2 row-span-4">
-              <label htmlFor="category">Choose a category</label>
-              <select
-                {...register("category")}
-                id="category"
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="">--Select--</option>
-                {carbonData.map((item) => (
-                  <option key={item.category} value={item.category}>
-                    {item.category}
-                  </option>
-                ))}
-              </select>
-              {errors.category && (
-                <p className="text-red-500">{errors.category.message}</p>
-              )}
-            </article>
-
-            <article className="flex flex-col items-start gap-2 row-span-4">
-              <label htmlFor="activityType">Choose your activity type</label>
-              <select
-                {...register("activityType", {
-                  onChange: (e) => setSelectedActivity(e.target.value),
-                })}
-                id="activityType"
-              >
-                <option value="">--Select--</option>
-                {activityTypes.map((item) => (
-                  <option
-                    key={item._id}
-                    value={item.item || item.mode || item.mode}
-                  >
-                    {item.item || item.activity || item.mode}
-                  </option>
-                ))}
-              </select>
-              {errors.activityType && (
-                <p className="text-red-500">{errors.activityType.message}</p>
-              )}
-            </article>
-
-            <article className="flex flex-col items-start gap-2 row-span-4">
-              <label htmlFor="quantity">
-                Quantity{" "}
-                <span className="text-green-500 font-black">{inputUnits}</span>
-              </label>
-              <input
-                type="number"
-                defaultValue={1}
-                {...register("quantity", { valueAsNumber: true })}
-                className="border border-blue-900 p-2 w-full"
-              />
-              {errors.quantity && (
-                <p className="text-red-500">{errors.quantity.message}</p>
-              )}
-              {!actionData?.success && (
-                <p className="text-red-600">{actionData?.message}</p>
-              )}
-            </article>
-            <article className="row-span-2 button-wrapper flex justify-center h-full pt-2">
-              <button type="submit" className="bg-black text-white w-full h-8">
-                submit
-              </button>
-            </article>
-          </form>
-        </div>
-
-        <div className="row-span-3 text-center card-footer">
-          <h2>Estimated contribution</h2>
-          <span>
-            {(factor * inputQuantity).toFixed(2)}
-            <span>{outputUnits}</span>
-          </span>
-        </div>
-      </div> */}
-      <Card>
+      <Card className="min-w-[400px]">
   <CardHeader>
-    <CardTitle>  Log your Carbon Activity </CardTitle>
+    <CardTitle className="font-black text-3xl">  Log your Carbon Activity </CardTitle>
     <CardDescription>welcome back to footprint logger !</CardDescription>
   </CardHeader>
   <CardContent>
@@ -443,16 +352,16 @@ function Activities() {
     </FormItem>
   )}
 />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="">Submit</Button>
       </form>
     </Form>
   </CardContent>
-  <CardFooter className={"w-full"}>
-    <div className="row-span-3 text-center card-footer w-full">
-          <h2>Estimated contribution</h2>
-          <span className="w-full">
-            {(factor * inputQuantity).toFixed(2)}
-            <span>{outputUnits}</span>
+  <CardFooter className={"w-full flex items-center justify-center"}>
+    <div className="row-span-3 text-center card-footer">
+          <h2>Estimated contribution: </h2>
+          <span className="w-full flex justify-between items-center text-green-500 font-black ml-1.5">
+            <p>{(factor * inputQuantity).toFixed(2)}</p>
+            <span className="text-gray-800">{outputUnits}</span>
           </span>
         </div>
   </CardFooter>

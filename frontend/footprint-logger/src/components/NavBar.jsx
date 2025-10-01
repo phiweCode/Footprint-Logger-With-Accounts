@@ -1,23 +1,23 @@
-import { NavLink, useNavigate, useSubmit } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import logo from "./carbon_footprint_logo.png";
 import { backendApi } from "../lib/utils";
 
 function NavBar({ ...props }) {
   const { isLoggedIn } = props;
-  const navigate = useNavigate();
-  const signOutOfContext = useSubmit();
+  const navigate = useNavigate(); 
+
+  console.log(isLoggedIn.session, "SESSION")
 
   const handleSubmit = async () => {
     try {
-      const res = await backendApi.post(`auth/sign_out`, null, {
+      await backendApi.post(`auth/sign_out`, null, {
         withCredentials: true,
       });
       backendApi.accessToken = null;
-      console.log("From logout", res);
+
       navigate("/sign_in");
     } catch (err) {
       backendApi.accessToken = null;
-      console.error(err);
     }
   };
 
@@ -86,7 +86,8 @@ function NavBar({ ...props }) {
             </div>
 
             <div className="flex items-center gap-4">
-              {isLoggedIn.session === true ? (
+              {
+              isLoggedIn !== true ? (
                 <div className="sm:flex sm:gap-4">
                   <NavLink
                     className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm"

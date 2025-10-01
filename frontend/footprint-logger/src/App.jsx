@@ -16,7 +16,7 @@ export const appAction = async ({request, context}) => {
 
 function App() {  
   const isLoggedIn = useLoaderData()
-
+  console.log(isLoggedIn.session, "session")
   return (
     <>
       <section className="h-screen overflow-auto">
