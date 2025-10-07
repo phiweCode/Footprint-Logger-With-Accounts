@@ -1,6 +1,4 @@
-import {
-    createBrowserRouter,
-} from 'react-router';
+import {createBrowserRouter} from 'react-router';
 import Home, { homeLoader } from './pages/home';
 import Activities, { activitiesAction, activitiesLoader } from './pages/Activities';
 import Dashboard, { dashboardLoader } from './pages/Dashboard';
@@ -14,6 +12,9 @@ import { authMiddleware } from './middleware/authMiddleware';
 import ProtectedLayout from './pages/protected/ProtectedLayout';
 import { appMiddleware } from './middleware/sessionMiddleware';
 import ErrorBoundary from './pages/errors';
+import profilePage from './pages/profile/profilePage';
+import Profile from './pages/profile';
+import ProfileLayout from './pages/profile/profileLayout';
 
 const router = createBrowserRouter([
     {   
@@ -54,7 +55,15 @@ const router = createBrowserRouter([
                         path: 'leaderboard',
                         Component: Leaderboard,
                         loader: leaderboardLoader
-                    }
+                    }, {
+                        Component: ProfileLayout
+                    }, 
+                    {
+                        path: "profile", 
+                        Component: profilePage, 
+                        middleware: [authMiddleware]
+
+                     }
                 ]
             },
         ]

@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';  
 import { backendApi } from '../../lib/utils';
 import { LoginForm } from '@/components/login-form';
+import { userContext } from '@/src/context/context';
 
 const formSchema = z.object({ 
   email: z.email({ 
@@ -15,7 +16,7 @@ const formSchema = z.object({
   })
 })
 
-export const signInAction = async ({ params, request }) => {
+export const signInAction = async ({ params, request, context }) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
@@ -30,10 +31,11 @@ export const signInAction = async ({ params, request }) => {
       }
     ); 
 
-    console.log("Response, ", res)
-
     const  accessToken = res?.data?.accessToken 
-    
+    const  userData = res?.data?.user 
+
+    console.log("From login, ", userData)
+
     if(accessToken){ 
       backendApi.accessToken = accessToken; 
 
@@ -42,9 +44,15 @@ export const signInAction = async ({ params, request }) => {
         config.headers['Authorization'] = `Bearer ${token}`;
         return config
       })
-    }
+    } 
 
-    console.log("From login: ", res)
+    context.set(userContext, userData)
+
+    //const contextData =  context.get(userContext); 
+
+   // console.log("Context data from login", contextData); 
+
+
 
     return  redirect('/dashboard')
 
@@ -61,8 +69,6 @@ function SignIn() {
 
   const actionData = useActionData(); 
   const signInSubmit = useSubmit();  
-
-  //console.log(actionData)
 
   const { 
     register, 
@@ -86,52 +92,7 @@ function SignIn() {
 
   return (
     <section className='flex items-center justify-center h-screen '>
-      {/* <div className="grid grid-rows-15 card-container lg:h-[60vh] bg-white min-w-[25vw] rounded-[5px] p-2 "> 
-        <div className="row-span-2 card-details"> 
-          <h1 className="cart-title text-4xl text-center">
-            Sign In
-          </h1>
-          <p className="card-description text-center pt-4">
-            welcome back to footprint logger !
-          </p>
-        </div> 
-        
-        <div className="row-span-10 flex items-center w-full h-full card-content justify-center"> 
-          <form action=" " className='grid grid-rows-10 w-full p-15' onSubmit={handleSubmit(onSubmit)}>
-
-            <article className="flex flex-col  items-start  gap-2 row-span-4" > 
-            <label htmlFor="email">
-              Email 
-            </label>
-            <input type="email"  {...register("email")}  placeholder='Enter your email' className='border border-blue-900 p-2 w-full' />
-            {errors.email && <p className='text-red-500'>{errors.email.message}</p>}
-            </article>
-           
-            <article className="flex flex-col  items-start  gap-2 row-span-4" > 
-            <label htmlFor="password">
-              Password
-            </label>
-            <input type="password" {...register("password")} placeholder='Enter your password' className='border border-blue-900 p-2 w-full' /> 
-               {errors.password && <p className='text-red-500'>{errors.password.message}</p>}
-               {!actionData?.success && <p className='text-red-600'>{actionData?.message}</p>}
-            </article> 
-
-
-            <article className="row-span-2 button-wrapper flex justify-center h-full pt-2">
-              <button type='submit' className='bg-black text-white w-full h-8'> 
-                    Sign In
-              </button>
-            </article>
-          </form>
-        </div>
-
-        <div className="row-span-3 text-center card-footer">
-          Don&apos;t have an account? <NavLink to="/sign_up">Sign Up</NavLink> 
-        </div>
-      </div> */}
-
       <LoginForm actionData={actionData} errors={errors} register={register} handleSubmit={handleSubmit} onSubmit={onSubmit}/>
-
     </section>
   )
 }

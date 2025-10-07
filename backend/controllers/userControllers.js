@@ -1,19 +1,27 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const { UserModel } = require('../models/userSchema');
-const { getUser, createUser, checkIfUserExists,} = require('../services/userServices');
-const dotenv = require('dotenv');
-const { token } = require('morgan');
-
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { UserModel } = require("../models/userSchema");
+const {
+  getUser,
+  createUser,
+  checkIfUserExists,
+  updateOrCreateGoal,
+  getUserGoal,
+} = require("../services/userServices");
+const dotenv = require("dotenv");
+const { token } = require("morgan");
 
 dotenv.config({
-  path: __dirname + "/../.env"
+  path: __dirname + "/../.env",
 });
 
-
 //Login controller and utility functions
-const signAccessToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET);
-const signRefreshToken = (user) => jwt.sign({ sub: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+const signAccessToken = (user) =>
+  jwt.sign({ sub: user.id }, process.env.JWT_ACCESS_SECRET);
+const signRefreshToken = (user) =>
+  jwt.sign({ sub: user.id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: "7d",
+  });
 
 const userLoginController = async (req, res) => {
   try {
@@ -21,12 +29,12 @@ const userLoginController = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Your authentication credentials were not provided."
+        message: "Your authentication credentials were not provided.",
       });
     }
 
-    const user = await getUser({email})
-    console.log(user)
+    const user = await getUser({ email });
+    console.log(user);
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
@@ -44,10 +52,10 @@ const userLoginController = async (req, res) => {
 
     res.cookie("jwt", accessToken, {
       httpOnly: false,
-      sameSite: "lax",
+
       secure: process.env.NODE_ENV == "production",
-      path: '/',
-      maxAge: 5 * 60 * 1000
+      path: "/",
+      maxAge: 5 * 60 * 1000,
     });
 
     res.cookie("refresh", refreshToken, {
@@ -55,72 +63,73 @@ const userLoginController = async (req, res) => {
       sameSite: "lax",
       secure: process.env.NODE_ENV == "production",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.json({
-      message: "Logged in", 
-      user: { 
-        id: user._id, 
-      }, 
-      accessToken
+      message: "Logged in",
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
+      accessToken,
     });
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(500).json({ message: "Server error"});
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-//Sign up controller 
+//Sign up controller
 const createUserController = async (req, res) => {
   try {
-      const { firstName, lastName, email, password } = req.body;  
+    const { firstName, lastName, email, password } = req.body;
 
-      if(!firstName || !lastName || !password || !email)
-       return  res.status(400).json({ 
-          message: "Please provide all the required fields."
-        })  
-      
-      
-      if(await checkIfUserExists({email}))
-       return  res.status(400).json({ 
-          message: "The email provided already exists. Please use a different email."
-      }) 
+    if (!firstName || !lastName || !password || !email)
+      return res.status(400).json({
+        message: "Please provide all the required fields.",
+      });
 
-      const hashedPassword = await bcrypt.hash(password, 10); 
+    if (await checkIfUserExists({ email }))
+      return res.status(400).json({
+        message:
+          "The email provided already exists. Please use a different email.",
+      });
 
-      const newUser = { 
-        firstName, 
-        lastName, 
-        email, 
-        password: hashedPassword 
-      }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      const user = await createUser({newUser})
+    const newUser = {
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    };
 
-      console.log(user)
+    const user = await createUser({ newUser });
 
-     return res.status(201).json({ 
-        id: user._id, 
-        firstName: user.firstName, 
-        lastName: user.lastName, 
-        email: user.email
-      })
+    console.log(user);
 
-
+    return res.status(201).json({
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    });
   } catch (error) {
-   return res.status(500).json({ 
+    return res.status(500).json({
       message: "Server error",
-      error: error.message
-    })
+      error: error.message,
+    });
   }
 };
 
-//logout 
+//logout
 const logoutController = async (req, res) => {
   try {
     const refreshToken = req.cookies?.refresh;
-    if (!refreshToken) return res.status(204).send(); 
+    if (!refreshToken) return res.status(204).send();
 
     const user = await UserModel.findOne({ refreshToken });
     if (user) {
@@ -128,89 +137,151 @@ const logoutController = async (req, res) => {
       await user.save();
     }
 
-    res.cookie('refresh', '', {
+    res.cookie("refresh", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV == "production", 
-      sameSite: 'lax',
-      path: '/',
-      expires: new Date(0)
+      secure: process.env.NODE_ENV == "production",
+      sameSite: "lax",
+      path: "/",
+      expires: new Date(0),
     });
 
-
-    res.cookie("jwt",null, {
+    res.cookie("jwt", null, {
       httpOnly: false,
       sameSite: "lax",
       secure: process.env.NODE_ENV == "production",
-      path: '/',
-      maxAge: new Date(0)
+      path: "/",
+      maxAge: new Date(0),
     });
 
-    return res.status(200).json({ message: 'Logged out successfully' });
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
   }
-}; 
+};
 
-//refresh token controller  
-const refreshTokenController = async (req, res) => { 
-  const {refresh} = req.cookies
-  if(!refresh) return res.status(401).json({
-    message: "Unauthorized"
-  }) 
+//refresh token controller
+const refreshTokenController = async (req, res) => {
+  const { refresh } = req.cookies;
+  if (!refresh)
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
 
   try {
-      jwt.verify(refresh, process.env.JWT_REFRESH_SECRET, async (err, decoded)=>{
+    jwt.verify(
+      refresh,
+      process.env.JWT_REFRESH_SECRET,
+      async (err, decoded) => {
+        if (err)
+          return res.status(401).json({
+            message: "Invalid refresh token.",
+          });
 
-      if(err) return res.status(401).json({ 
-        message: "Invalid refresh token."
-      })
+        const user = await UserModel.findOne({ _id: decoded.sub });
 
-      const user = await UserModel.findOne({_id: decoded.sub}); 
-      
-      if(!user) return res.status(401).json({ 
-        message: "Bad credentials."
-      }) 
+        if (!user)
+          return res.status(401).json({
+            message: "Bad credentials.",
+          });
 
-      const newAccess = signAccessToken(user); 
-      res.cookie('jwt', newAccess ,{ 
-        httpOnly: false, 
-        sameSite: "lax", 
-        path: "/",
-        secure: process.env.NODE_ENV == "production",
-        maxAge: 1 * 60 * 1000
-      })
+        const newAccess = signAccessToken(user);
+        res.cookie("jwt", newAccess, {
+          httpOnly: false,
+          sameSite: "lax",
+          path: "/",
+          secure: process.env.NODE_ENV == "production",
+          maxAge: 1 * 60 * 1000,
+        });
 
+        return res.status(200).json({
+          ok: true,
+          userId: user._id,
+          accessToken: newAccess,
+        });
+      }
+    );
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error occurred.",
+    });
+  }
+};
+
+//get user profile details
+const getUserProfileDetails = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await getUser({ userId });
+
+    if (user) {
+      const { firstName, lastName, email, goal } = user;
       return res.status(200).json({
-        ok: true, 
-        userId: user._id, 
-        accessToken: newAccess
-      })
-      }); 
-  
-  } catch (error) {
-   return res.status(500).json({ 
-    message: "Server error occurred."
-   })
-  }
-} 
+        firstName,
+        lastName,
+        email,
+        goal,
+      });
+    }
 
-//get user profile details  
-const getUserProfileDetails =  async (req, res) => { 
+    return res.status(200).json({
+      message: "user no longer exists",
+    });
+  } catch (error) {
+    throw Error(error.message);
+  }
+};
+
+const updateOrCreateGoalController = async (req, res) => {
   try {
-    //const authToken = req.cookies.headers["Authorization"]; 
-    const userId = req.user 
-    const users = await getUser({userId, email})
-    return res.status(200).json(users)
-  } catch (error) {
-    throw Error(error.message)
-  }
-}
+    const { goal } = req.body;
+    const userId = req.user;
 
+    if (goal) {
+      const newGoal = await updateOrCreateGoal({ userId, goal });
+      if (newGoal) {
+        return res.status(201).json({
+          message: "Goal successfully created or updated.",
+          data: newGoal,
+        });
+      }
+
+      return res.status(400).json({
+        message: "Bad request",
+      });
+    } else {
+      return res.status(400).json({
+        message: "The goal value is required",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" + error.message });
+  }
+};
+
+const getUserGoalController = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const userGoal = await getUserGoal(userId);
+
+    return res.status(200).json({
+      userGoal,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server" + error.message,
+    });
+  }
+};
 
 module.exports = {
-  userLoginController, 
-  createUserController, 
-  logoutController, 
+  userLoginController,
+  createUserController,
+  logoutController,
   refreshTokenController,
-  getUserProfileDetails
-}
+  getUserProfileDetails,
+  updateOrCreateGoalController,
+  getUserGoalController,
+};

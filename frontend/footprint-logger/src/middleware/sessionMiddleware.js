@@ -1,5 +1,5 @@
 import { backendApi } from "../lib/utils";
-import { isLoggedIn } from "../context/context";
+import { isLoggedIn, userContext } from "../context/context";
 
 export const appMiddleware = async ({ context }) => {
     try {
@@ -9,9 +9,14 @@ export const appMiddleware = async ({ context }) => {
             return config
         })
         await backendApi("auth/check", { withCredentials: true });
-        context.set(isLoggedIn, { session: true })
+        context.set(isLoggedIn, { session: true });
+
+        const userProfileData = await backendApi('auth/profile', {withCredentials: true}); 
+        const profileData = {...userProfileData.data} 
+        context.set(userContext, profileData)
+
     } catch (error) {
-        if (error.code === 'ERR_NETWORK') {
+        if (error.code === 'ERR_CONNECTION_REFUSED') {
             console.log('Target service is down');
             throw new Error(error.message)
         } else {
