@@ -59,7 +59,17 @@ export const activitiesAction = async ({ request, context }) => {
   const activityType = formData.get("activityType");
   const quantity = formData.get("quantity"); 
   const goal = formData.get("goal")
-  const intent = formData.get("_intent")
+  const intent = formData.get("_intent"); 
+  const goalId = formData.get("goalId"); 
+
+  console.log("Form Data Received in action:", goalId )
+
+  if (intent !== "Update Activity" && intent !== "Update Goal" && intent !== "Delete Goal") {
+    return {
+      success: false,
+      message: "Invalid form submission",
+    };
+  }
 
   switch(intent) 
   {  
@@ -120,7 +130,34 @@ export const activitiesAction = async ({ request, context }) => {
           success: false,
           message: error.response?.data.message,
         };
+      } 
+
+    case "Delete Goal":
+      try {
+        const res = await backendApi.delete(
+          "auth/delete_goal/" + goalId,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        const data = res.data;
+        console.log("action in logger for delete goal", data);
+        return {
+          success: true,
+          message: data.message,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data.message,
+        };
       }
+    
   }
   return;
 };
@@ -146,7 +183,6 @@ function Activities() {
   const actionData = useActionData();
   const loaderData = useLoaderData();
   const contributionSubmit = useSubmit();
-  const goalSubmit = useSubmit();
 
   const [activityTypes, setActivityTypes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -158,7 +194,9 @@ function Activities() {
 
   const { data: carbonData } = loaderData || {};
 
-  const { goal } = carbonData; 
+  const { goal } = carbonData;  
+
+  console.log("Goal data in Activities page:", goal);
 
   const {
     register,
@@ -215,12 +253,13 @@ function Activities() {
     reset();
   };
 
-  const inputQuantity = watch("quantity");
+  const inputQuantity = watch("quantity") || 1;
 
   if (!loaderData?.success) return <p>Loading…</p>;
 
   return (
-    <section className="flex items-center justify-center  h-screen">
+    <section className="flex flex-col items-center justify-center  h-screen">
+       <GoalComponent goal={goal} />
        <Card className="min-w-[400px]">
         <CardHeader>
           <CardTitle className="font-black text-3xl">
@@ -441,7 +480,6 @@ function Activities() {
           </div>
         </CardFooter>
       </Card> 
-      <GoalComponent goal={goal} />
     </section>
   );
 }

@@ -83,13 +83,16 @@ const updateOrCreateGoal = async ({ userId, goal }) => {
       },
       { $set: { weeklyLimitGoal: goal } },
       { new: true }
-    );
+    ); 
+
+    if(userDoc) console.log("Existing goal found, updating the goal.");
+    if(!userDoc) console.log("No existing goal found, creating a new one.");
 
     if (!userDoc) {
       return await GoalsModel.insertOne(
-        { user: userId },
-        { weeklyLimitGoal: goal },
-        { endsAt: oneWeekLater },
+        { user: userId,
+        weeklyLimitGoal: goal ,
+        endsAt: oneWeekLater },
         { new: true }
       );
     }
@@ -110,11 +113,26 @@ const getUserGoal = async (userId) => {
       endsAt: {
         $gte: currentTime, $lte: oneWeekLater
       }
-    })
+    }) 
+
+    console.log("User goal from service", userGoal);
     return userGoal
   } catch (error) {
     throw new Error(`${error.message}`)
+  }}
+; 
+
+const deleteUserGoal = async ({ userId , goalId }) => { 
+  try {
+    const deletedGoal = await GoalsModel.deleteOne({ user: userId , 
+      _id: goalId,
+     }); 
+
+    return deletedGoal;
+  } catch (error) {
+    throw Error(error.message)
   }
+
 }
 
 module.exports = {
@@ -125,5 +143,6 @@ module.exports = {
   checkIfUserExists,
   createGoal,
   updateOrCreateGoal,
-  getUserGoal
-};
+  getUserGoal, 
+  deleteUserGoal
+}

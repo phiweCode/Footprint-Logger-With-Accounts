@@ -7,6 +7,7 @@ const {
   checkIfUserExists,
   updateOrCreateGoal,
   getUserGoal,
+  deleteUserGoal
 } = require("../services/userServices");
 const dotenv = require("dotenv");
 const { token } = require("morgan");
@@ -239,7 +240,9 @@ const updateOrCreateGoalController = async (req, res) => {
     const userId = req.user;
 
     if (goal) {
-      const newGoal = await updateOrCreateGoal({ userId, goal });
+      const newGoal = await updateOrCreateGoal({ userId, goal }); 
+
+          console.log("Goal from update or create service", newGoal);
       if (newGoal) {
         return res.status(201).json({
           message: "Goal successfully created or updated.",
@@ -274,7 +277,31 @@ const getUserGoalController = async (req, res) => {
       message: "Server" + error.message,
     });
   }
-};
+};  
+
+const deleteUserGoalController = async (req, res) => {
+  try {
+    const userId = req.user;
+    const {goalId }= req.params
+    console.log("Goal id from request",goalId);
+    if (!goalId) {
+      return res.status(400).json({
+        message: "Please provide the goal id to delete the goal.",
+      });
+    }
+
+    const userGoal = await deleteUserGoal({goalId, userId});
+    console.log(userGoal);
+    return res.status(200).json({
+      userGoal,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server" + error.message,
+    });
+  }
+}
+
 
 module.exports = {
   userLoginController,
@@ -284,4 +311,5 @@ module.exports = {
   getUserProfileDetails,
   updateOrCreateGoalController,
   getUserGoalController,
+  deleteUserGoalController
 };

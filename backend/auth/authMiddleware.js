@@ -5,9 +5,7 @@ require('dotenv').config({
 
 const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
-
-    console.log(authHeader, process.env.JWT_ACCESS_TOKEN)
-
+    
     if (!authHeader?.startsWith('Bearer '))
         return res.status(401).json({
             message: "Missing or invalid Authorization header."

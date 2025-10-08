@@ -15,9 +15,9 @@ const formSchema = z.object({
     .positive({ message: "Please enter a valid quantity." }),
 });
 
-function GoalComponent({ goal, contributionSubmit }) {
-  const { weeklyLimitGoal, endsAt, createdAt } = goal[0];
-  const [edit, setEdit] = useState(false);
+function GoalComponent({ goal}) {
+  const [edit, setEdit] = useState(false);  
+  const { weeklyLimitGoal, endsAt, createdAt, _id: goalId } = goal[0] || {};
 
   const {
     register,
@@ -26,7 +26,7 @@ function GoalComponent({ goal, contributionSubmit }) {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { goal: weeklyLimitGoal },
+    defaultValues: { goal: weeklyLimitGoal || 0},
   });
 
   const goalSubmitHandler = useSubmit()
@@ -50,11 +50,32 @@ function GoalComponent({ goal, contributionSubmit }) {
     } catch (err) {
       console.error("Error submitting goal:", err);
     }
-  };
+  }; 
+
+  const deleteGoal = () => async (e) => { 
+    try {
+      const fd = new FormData(); 
+      
+      fd.append("goalId", goalId);
+      fd.append("_intent", "Delete Goal");
+
+      console.log("Delete Goal:", Object.fromEntries(fd));
+      await goalSubmitHandler(fd, { action: "/activities", method: "post" }); 
+      setEdit(false); 
+
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      throw error;
+    }
+  }
 
   return (
-    <div className="h-auto">
-      <h1>Your current goal</h1>
+   goal?.length !== 0 ? 
+      (<div className="h-auto min-w-[300px] max-w-md p-4 border rounded-lg shadow-md flex flex-col items-center">
+      <h1 className="font-black text-2xl mb-4">Your current goal</h1> 
+      <article>
+        <p className="font-black text-9xl text-green-600 ">{weeklyLimitGoal}</p>
+      </article>
 
       <div className="goal-form">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -80,13 +101,53 @@ function GoalComponent({ goal, contributionSubmit }) {
               Change
             </Button>
           )}
+
+          {edit && (
+            <Button type="button" onClick={deleteGoal()} className="mt-2">
+              Delete
+            </Button>
+          )}
         </form>
 
-        <p className="createdAt">Created: {createdAt.split("T")[0]}</p>
-        <p className="createdAt">Ends On: {endsAt.split("T")[0]}</p>
+        <p className="createdAt">Created: {createdAt?.split("T")[0]}</p>
+        <p className="createdAt">Ends On: {endsAt?.split("T")[0]}</p>
       </div>
-    </div>
-  );
+    </div>) : (
+
+      <div className="h-auto min-w-[300px] max-w-md p-4 border rounded-lg shadow-md flex flex-col items-center">
+        <h1 className="font-black text-2xl mb-4">No current goal set</h1> 
+        <p className="text-center">Set a weekly carbon footprint goal to help track and reduce your emissions.</p>
+         <div className="goal-form">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="input-wrapper flex gap-1.5 flex-col">
+            <label htmlFor="goal">Create new goal</label>
+            <Input
+              type="number"
+              step="any"
+              {...register("goal", { valueAsNumber: true })}
+              onFocus={() => setEdit(true)}
+              onBlur={(e) => {
+                if (!e.target.value) setEdit(false);
+              }}
+              className="border-0 font-black"
+            />
+          </div>
+
+          {errors.goal && (
+            <p className="text-red-500 text-sm">{errors.goal.message}</p>
+          )}
+
+            <Button type="submit" className="">
+              Create New Goal
+            </Button>
+         
+        </form>
+      </div>
+      </div>
+    
+  
+    )
+);
 }
 
 export default GoalComponent;
